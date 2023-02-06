@@ -1,0 +1,95 @@
+
+
+{{/* only use images smaller than or equal to the src (original) image size, as Hugo will upscale small images */}}
+{{/* set the sizes attribute to (min-width: 35em) 1200px, 100vw unless overridden in shortcode */}}
+
+<figure {{ with .Get "class" }} class="{{ . }}"{{ end }} style="margin: 2em;{{- with .Get "align" }}float: {{ . }};vertical-align: text-top;{{ end -}}" >
+        {{/* get file that matches the filename as specified as src="" in shortcode */}}
+        {{ $src := .Page.Resources.GetMatch (printf "*%s*" (.Get "src")) }}
+        {{ $isSvg := strings.HasSuffix $src.Name ".svg" }}
+        
+        {{/* set image sizes, these are hardcoded for now, x dictates that images are resized to this width */}}
+        
+        {{ $microww := default "300x webp" }}
+        {{ $tinyw := default "500x webp" }}
+        {{ $smallw := default "800x webp" }}
+        {{ $mediumw := default "1200x webp" }}
+        {{ $largew := default "1500x webp" }}
+
+        {{ with .Get "width" }}
+            {{ if (lt . 800) }}
+                {{ $smallw = printf "%sx webp" . }}
+            {{ end }}
+            {{ if (lt . 1200) }}
+                {{ $mediumw = printf "%sx webp" . }}
+            {{ end }}
+            {{ if (lt . 1500) }}
+                {{ $largew = printf "%sx webp" . }}
+            {{ end }}
+        {{ end }}
+
+        {{ if not $isSvg }}
+        {{/* resize the src image to the given sizes */}}
+        
+        {{ .Scratch.Set "micro" ($src.Resize $microww) }}
+        {{ .Scratch.Set "tiny" ($src.Resize $tinyw) }}
+        {{ .Scratch.Set "small" ($src.Resize $smallw) }}
+        {{ .Scratch.Set "medium" ($src.Resize $mediumw) }}
+        {{ .Scratch.Set "large" ($src.Resize $largew) }}
+        {{ end }}
+        
+        {{/* add the processed images to the scratch */}}
+        
+        {{ $micro := .Scratch.Get "micro" }}
+        {{ $tiny := .Scratch.Get "tiny" }}
+        {{ $small := .Scratch.Get "small" }}
+        {{ $medium := .Scratch.Get "medium" }}
+        {{ $large := .Scratch.Get "large" }}
+        
+    {{- if .Get "link" -}}
+        <a href="{{ .Get "link" }}"{{ with .Get "target" }} target="{{ . }}"{{ end }}{{ with .Get "rel" }} rel="{{ . }}"{{ end }}>
+    {{- end -}}
+    <picture>
+        {{ if not $isSvg }}
+        <source media="(max-width: 476px)" 
+            srcset="{{with $micro.RelPermalink }}{{.}}{{ end }}">
+
+            <source media="(max-width: 576px)" 
+            srcset="{{with $tiny.RelPermalink }}{{.}}{{ end }}">
+    
+        <source media="(max-width: 992px)" 
+            srcset="{{with $small.RelPermalink }}{{.}}{{ end }}">
+    
+        <source media="(max-width: 1400px)" 
+            srcset="{{with $medium.RelPermalink }}{{.}}{{ end }}">
+    
+        <source media="(min-width: 1600px)" 
+            srcset="{{with $large.RelPermalink }}{{.}}{{ end }}">
+        {{ end }}
+
+        <img src="{{ .Get "src" }}"
+            {{- if or (.Get "alt") (.Get "caption") }}
+            alt="{{ with .Get "alt" }}{{ . }}{{ else }}{{ .Get "caption" | markdownify| plainify }}{{ end }}"
+            {{- end -}}
+            {{- /* with .Get "width" }} width="{{ . }}"{{ end -}}
+            {{- with .Get "height" }} height="{{ . }}"{{ end */ -}}
+            {{- if $isSvg }}style="width: 100%"{{ end -}}
+        /><!-- Closing img tag -->
+    </picture>
+    {{- if .Get "link" }}</a>{{ end -}}
+    {{- if or (or (.Get "title") (.Get "caption")) (.Get "attr") -}}
+        <figcaption>
+            {{ with (.Get "title") -}}
+                <h4>{{ . }}</h4>
+            {{- end -}}
+            {{- if or (.Get "caption") (.Get "attr") -}}<p>
+                {{- .Get "caption" | markdownify -}}
+                {{- with .Get "attrlink" }}
+                    <a href="{{ . }}">
+                {{- end -}}
+                {{- .Get "attr" | markdownify -}}
+                {{- if .Get "attrlink" }}</a>{{ end }}</p>
+            {{- end }}
+        </figcaption>
+    {{- end }}
+</figure>

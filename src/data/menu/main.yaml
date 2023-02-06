@@ -1,0 +1,16 @@
+---
+main:
+  - name: Getting Started
+    sub:
+      - name: Introduction
+        ref: /getting-started/intro
+      - name: How it works?
+        ref: /getting-started/how-it-works
+  - name: Working with AppForge tools
+    sub:
+      - name: Quickstart
+        ref: /working-with-appforge-tools/quickstart
+        sub:
+          - name: Setup Backstage
+            ref: /working-with-appforge-tools/quickstart/setup-backstage
+      - name: Configuration in detail
