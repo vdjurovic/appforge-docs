@@ -13,4 +13,10 @@ main:
         sub:
           - name: Setup Backstage
             ref: /working-with-appforge-tools/quickstart/setup-backstage
+          - name: Configure Maven project
+            ref: /working-with-appforge-tools/quickstart/configure-maven-project
+          - name: Create basic Ignite configuration
+            ref: /working-with-appforge-tools/quickstart/configure-app-ignite
+          - name: Detailed application configuration
+            ref: /working-with-appforge-tools/quickstart/app-config-detail
       - name: Configuration in detail
